@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/afs/cern.ch/user/l/lfavilla/CMSSW_14_0_5_patch1/src/DPGAnalysis/RateVsLumi/analyzer/RPCAnalyzer.py", line 34, in <module>
+    df      = uproot.concatenate([infile + ":demo/hit_tree" for infile in file_list], library="pd", cut = que_) # cut = que_[:-2]
+  File "/cvmfs/cms.cern.ch/slc7_amd64_gcc12/external/py3-uproot/5.0.7-a643c4680dac3e01f87c45edf2bb2149/lib/python3.9/site-packages/uproot/behaviors/TBranch.py", line 361, in concatenate
+    arrays = hasbranches.arrays(
+  File "/cvmfs/cms.cern.ch/slc7_amd64_gcc12/external/py3-uproot/5.0.7-a643c4680dac3e01f87c45edf2bb2149/lib/python3.9/site-packages/uproot/behaviors/TBranch.py", line 810, in arrays
+    arrays, expression_context, branchid_interpretation = _regularize_expressions(
+  File "/cvmfs/cms.cern.ch/slc7_amd64_gcc12/external/py3-uproot/5.0.7-a643c4680dac3e01f87c45edf2bb2149/lib/python3.9/site-packages/uproot/behaviors/TBranch.py", line 2974, in _regularize_expressions
+    _regularize_expression(
+  File "/cvmfs/cms.cern.ch/slc7_amd64_gcc12/external/py3-uproot/5.0.7-a643c4680dac3e01f87c45edf2bb2149/lib/python3.9/site-packages/uproot/behaviors/TBranch.py", line 2799, in _regularize_expression
+    for symbol in language.free_symbols(
+  File "/cvmfs/cms.cern.ch/slc7_amd64_gcc12/external/py3-uproot/5.0.7-a643c4680dac3e01f87c45edf2bb2149/lib/python3.9/site-packages/uproot/language/python.py", line 377, in free_symbols
+    node = _expression_to_node(expression, file_path, object_path)
+  File "/cvmfs/cms.cern.ch/slc7_amd64_gcc12/external/py3-uproot/5.0.7-a643c4680dac3e01f87c45edf2bb2149/lib/python3.9/site-packages/uproot/language/python.py", line 30, in _expression_to_node
+    raise SyntaxError(
+SyntaxError: expected a single expression
+in file root://cms-xrd-global.cern.ch//store/user/lfavilla/ZeroBias/ZB_RPCNtuplizer_F9573/240623_091954/0000/RPCNtuple_37.root
+in object /demo/hit_tree;1

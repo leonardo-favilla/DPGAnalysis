@@ -1,0 +1,13 @@
+Proxy_filename          = x509up
+Proxy_path              = /afs/cern.ch/user/l/lfavilla/private/$(Proxy_filename)
+universe                = vanilla
+x509userproxy           = $(Proxy_path)
+use_x509userproxy       = true
+should_transfer_files   = YES
+when_to_transfer_output = ON_EXIT
++JobFlavour             = "tomorrow"
+executable              = sub_Analize_all_condor.sh
+output                  = condor/output/check.out
+error                   = condor/error/check.err
+log                     = condor/log/check.log
+queue
