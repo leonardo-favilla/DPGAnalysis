@@ -1,2 +1,4 @@
-# IGNORING .LOG FILES
+# IGNORING .log FILES
 *.log
+# IGNORING .err FILES
+*.err
