@@ -2,3 +2,5 @@
 *.log
 # IGNORING .err FILES
 *.err
+# IGNORING .out FILES
+*.out
