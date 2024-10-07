@@ -29,7 +29,7 @@ elif username == 'lfavilla':
     uid = 159320
 
 
-def sub_writer(macro_to_run, fill, i):
+def sub_writer(macro_to_run, fill, part):
     f = open("condor.sub", "w")
     f.write("Proxy_filename          = x509up\n")
     f.write("Proxy_path              = /afs/cern.ch/user/" + inituser + "/" + username + "/private/$(Proxy_filename)\n")
@@ -42,22 +42,22 @@ def sub_writer(macro_to_run, fill, i):
     #f.write("transfer_output_remaps  = \""+outname+"_Skim.root=root://eosuser.cern.ch///eos/user/"+inituser + "/" + username+"/DarkMatter/topcandidate_file/"+dat_name+"_Skim.root\"\n")
     f.write('requirements            = (TARGET.OpSysAndVer =?= "CentOS7")\n')
     f.write("+JobFlavour             = \"testmatch\"\n") # options are espresso = 20 minutes, microcentury = 1 hour, longlunch = 2 hours, workday = 8 hours, tomorrow = 1 day, testmatch = 3 days, nextweek     = 1 week
-    f.write("executable              = runner_"+macro_to_run+"_F"+fill+"_"+str(i)+".sh\n")
+    f.write("executable              = runner_"+macro_to_run+"_F"+fill+"_"+str(part)+".sh\n")
     f.write("arguments               = \n")
     #f.write("input                   = input.txt\n")
-    f.write("output                  = condor/output/"+macro_to_run+"_F"+fill+"_"+str(i)+".out\n")
-    f.write("error                   = condor/error/"+macro_to_run+"_F"+fill+"_"+str(i)+".err\n")
-    f.write("log                     = condor/log/"+macro_to_run+"_F"+fill+"_"+str(i)+".log\n")
+    f.write("output                  = condor/output/"+macro_to_run+"_F"+fill+"_"+str(part)+".out\n")
+    f.write("error                   = condor/error/"+macro_to_run+"_F"+fill+"_"+str(part)+".err\n")
+    f.write("log                     = condor/log/"+macro_to_run+"_F"+fill+"_"+str(part)+".log\n")
     f.write("queue\n")
 
 
-def sh_writer(macro_to_run, fill, txt_list, i, colliding_scheme, outFolder):
-    f = open("runner_"+macro_to_run+"_F"+fill+"_"+str(i)+".sh", "w")
+def sh_writer(macro_to_run, fill, txt_list, part, colliding_scheme, outFolder):
+    f = open("runner_"+macro_to_run+"_F"+fill+"_"+str(part)+".sh", "w")
     f.write("#!/usr/bin/bash\n")
     f.write("cd /afs/cern.ch/user/l/lfavilla/CMSSW_14_0_5_patch1/src/DPGAnalysis/RateVsLumi/analyzer\n")
     f.write("eval 'scramv1 runtime -sh'\n")
     f.write("cmsenv\n")
-    f.write("python3 "+macro_to_run+".py "+str(i)+" ["+",".join(txt_list)+"] "+colliding_scheme+" "+ outFolder+"\n")
+    f.write("python3 "+macro_to_run+".py "+str(part)+" ["+",".join(txt_list)+"] "+colliding_scheme+" "+ outFolder+"\n")
     # f.write("export XRD_NETWORKSTACK=IPv4\n")
 
 
@@ -76,11 +76,12 @@ os.popen("cp /tmp/x509up_u" + str(uid) + " /afs/cern.ch/user/" + inituser + "/" 
 
 ######## LAUNCH CONDOR ########
 abs_path             = "/afs/cern.ch/user/l/lfavilla/CMSSW_14_0_5_patch1/src/DPGAnalysis/RateVsLumi"
-fill                 = 9573 # 8754
+fill                 = 8754 # 8754
 if fill==8754:
     RPCNtuples_txt   = f"{abs_path}/RPCNtuples/crab_ZB_RPCNtuplizer_F8754.txt"
     colliding_scheme = f"{abs_path}/fill_schemes/Fill_8754/colliding_8754.txt"
-    outFolder        = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_8754"
+    # outFolder        = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_8754"
+    outFolder        = "/eos/user/l/lfavilla/RPC/analyzer_trial"
 elif fill==9573:
     RPCNtuples_txt   = f"{abs_path}/RPCNtuples/crab_ZB_RPCNtuplizer_F9573.txt"
     colliding_scheme = f"{abs_path}/fill_schemes/Fill_9573/colliding_9573.txt"
@@ -103,13 +104,13 @@ for i,txt_list in enumerate(txt_lists):
     sh_writer(macro_to_run="RPCAnalyzer",
             fill=str(fill),
             txt_list=txt_list,
-            i=i,
+            part=i,
             colliding_scheme=colliding_scheme,
             outFolder=outFolder
             )
     sub_writer(macro_to_run="RPCAnalyzer",
             fill=str(fill),
-            i=i
+            part=i
             )
     if not dryrun:
         os.popen("condor_submit condor.sub")
