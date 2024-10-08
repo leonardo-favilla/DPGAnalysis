@@ -1,10 +1,10 @@
 import json
 
-fill              = 9573 # 8754-9573
+fill              = 10084 # 8754-9573-10084
 inFilename_dead   = f"./crab/noisy_files/Fill_{fill}/All_Dead_strips_ID.json"
-inFilename_noisy  = f"./crab/noisy_files/Fill_{fill}/All_Noisy_strips_ID.json"
+inFilename_noisy  = f"./crab/noisy_files/Fill_{fill}/All_StaticNoisy_strips_ID.json"
 
-outFilename       = f"./crab/noisy_files/Fill_{fill}/All_Dead_and_Noisy_strips_ID.txt"
+outFilename       = f"./crab/noisy_files/Fill_{fill}/All_Dead_and_StaticNoisy_strips_ID.txt"
 
 if inFilename_dead!="":
     with open(inFilename_dead, "r") as f:
