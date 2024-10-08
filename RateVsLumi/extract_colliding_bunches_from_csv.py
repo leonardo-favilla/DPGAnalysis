@@ -1,8 +1,8 @@
 import pandas as pd
 
 # Load the .csv file containing bunches information
-inFile       = "fill_schemes/Fill_6919/fill_scheme_6919.csv"
-outFile      = "fill_schemes/Fill_6919/colliding_6919.txt"
+inFile       = "fill_schemes/Fill_10084/fill_scheme_10084.csv"
+outFile      = "fill_schemes/Fill_10084/colliding_10084.txt"
 df           = pd.read_csv(inFile,header=0)
 
 # Select only colliding bunches
