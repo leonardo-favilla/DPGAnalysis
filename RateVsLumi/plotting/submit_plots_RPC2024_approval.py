@@ -2,7 +2,7 @@ import os
 import argparse
 # fill = 9573 # 8754-9573
 
-usage       = 'python3 submit_plots_RPC2024_approval -f <fill_number>'
+usage       = 'python3 submit_plots_RPC2024_approval.py -f <fill_number>'
 parser      = argparse.ArgumentParser(usage)
 parser.add_argument('-f', '--fill',       dest = 'fill',      required = True,                                type = int,                             help = 'specify the fill number')
 args        = parser.parse_args()
