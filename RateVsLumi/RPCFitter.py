@@ -3,7 +3,7 @@ import json
 from hist_settings import *
 
 ROOT.gROOT.SetBatch()
-fill = 8754
+fill = 10084 # 8754-9573-10084
 if fill == 8754:
         f       = ROOT.TFile.Open("/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_8754/fileout.root")
         fout    = ROOT.TFile.Open("/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_8754/RPC_fit_F8754.root", "RECREATE")
@@ -12,9 +12,17 @@ elif fill == 9573:
         f       = ROOT.TFile.Open("/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_9573_dead_and_noisy_noSectorRollSubdvision/fileout.root")
         fout    = ROOT.TFile.Open("/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_9573_dead_and_noisy_noSectorRollSubdvision/RPC_fit_F9573.root", "RECREATE")
         outJson = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_9573_dead_and_noisy_noSectorRollSubdvision/RPC_fit_F9573_fitResults.json"
+elif fill == 10084:
+        # f       = ROOT.TFile.Open("/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_10084_Dead_and_StaticNoisy/fileout.root")
+        # fout    = ROOT.TFile.Open("/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_10084_Dead_and_StaticNoisy/RPC_fit_F10084.root", "RECREATE")
+        # outJson = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_10084_Dead_and_StaticNoisy/RPC_fit_F10084_fitResults.json"
+
+        f       = ROOT.TFile.Open("/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_10084_Dead_and_Noisy/fileout.root")
+        fout    = ROOT.TFile.Open("/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_10084_Dead_and_Noisy/RPC_fit_F10084.root", "RECREATE")
+        outJson = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_10084_Dead_and_Noisy/RPC_fit_F10084_fitResults.json"
 fitresults_json = {}
 
-def fitter(name, region= "all", min = 9, max = 20):
+def fitter(name, region="all", min=9, max=20):
         print(name+"_"+region)
         hit_hist = ROOT.TH1F(f.Get(name+"_"+region))
         nBX = 5

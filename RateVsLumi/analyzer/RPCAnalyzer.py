@@ -27,7 +27,7 @@ print("Output file:     " + outFolder + "/" + "fileout" + part + ".root")
 
 # blacklist = np.array(open("../off_noisy_bar_endcap_new.txt","r").read().replace("\n"," ").split()[1::2],dtype=type("a"))
 # que_    = "not (region == 1 & station == 4 & ring==3 & sector == 2 & (subsector == 3 | subsector == 4 | subsector == 5))" # for Fill=9573 [errata]
-que_    = "" # for Fill=8754-9573
+que_    = "" # for Fill=8754-9573-10084
 # for i in blacklist: que_=que_ + "(RPC_Id!="+i+") & " 
 
 
@@ -98,12 +98,13 @@ event_queries = {"event_5bx_all":"RPCbx>=-2 & RPCbx<=2",
 
 for h in range(0,5):
         for i in hist_dict.keys():
+                print(f"hit_hist({i+name_list[h]},que={hist_dict[i][0]},coll_region={h})")
                 hit_hist(i+name_list[h],que=hist_dict[i][0],coll_region=h)
-                print(i)
 for j in event_queries.keys():
+        print(f"evt_hist({j},que=event_queries[j])")
         evt_hist(j,que=event_queries[j])
-        print(j)
 
+fout.Close()
 endTime = datetime.datetime.now()
 print("Ending running at " + str(endTime))
 

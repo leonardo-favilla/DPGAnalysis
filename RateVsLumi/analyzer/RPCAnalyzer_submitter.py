@@ -28,6 +28,30 @@ elif username == 'acagnott':
 elif username == 'lfavilla':
     uid = 159320
 
+########### Variables depending on the fill ###########
+fill                 = 10084 # 8754-9573-10084
+if fill==8754:
+    release          = "CMSSW_14_0_5_patch1"
+    abs_path         = f"/afs/cern.ch/user/l/lfavilla/{release}/src/DPGAnalysis/RateVsLumi"
+    RPCNtuples_txt   = f"{abs_path}/RPCNtuples/crab_ZB_RPCNtuplizer_F8754.txt"
+    colliding_scheme = f"{abs_path}/fill_schemes/Fill_8754/colliding_8754.txt"
+    # outFolder        = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_8754"
+    outFolder        = "/eos/user/l/lfavilla/RPC/analyzer_trial"
+elif fill==9573:
+    release          = "CMSSW_14_0_5_patch1"
+    abs_path         = f"/afs/cern.ch/user/l/lfavilla/{release}/src/DPGAnalysis/RateVsLumi"
+    RPCNtuples_txt   = f"{abs_path}/RPCNtuples/crab_ZB_RPCNtuplizer_F9573.txt"
+    colliding_scheme = f"{abs_path}/fill_schemes/Fill_9573/colliding_9573.txt"
+    outFolder        = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_9573"
+elif fill==10084:
+    release          = "CMSSW_14_0_14"
+    abs_path         = f"/afs/cern.ch/user/l/lfavilla/{release}/src/DPGAnalysis/RateVsLumi"
+    # RPCNtuples_txt   = f"{abs_path}/RPCNtuples/crab_ZB_RPCNtuplizer_F10084_Dead_and_StaticNoisy.txt"
+    RPCNtuples_txt   = f"{abs_path}/RPCNtuples/crab_ZB_RPCNtuplizer_F10084_Dead_and_Noisy.txt"
+    colliding_scheme = f"{abs_path}/fill_schemes/Fill_10084/colliding_10084.txt"
+    # outFolder        = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_10084_Dead_and_StaticNoisy"
+    outFolder        = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_10084_Dead_and_Noisy"
+
 
 def sub_writer(macro_to_run, fill, part):
     f = open("condor.sub", "w")
@@ -39,8 +63,8 @@ def sub_writer(macro_to_run, fill, part):
     f.write("should_transfer_files   = YES\n")
     f.write("when_to_transfer_output = ON_EXIT\n")
     f.write("transfer_input_files    = $(Proxy_path)\n")
-    #f.write("transfer_output_remaps  = \""+outname+"_Skim.root=root://eosuser.cern.ch///eos/user/"+inituser + "/" + username+"/DarkMatter/topcandidate_file/"+dat_name+"_Skim.root\"\n")
-    f.write('requirements            = (TARGET.OpSysAndVer =?= "CentOS7")\n')
+    # f.write("transfer_output_remaps  = \""+outname+"_Skim.root=root://eosuser.cern.ch///eos/user/"+inituser + "/" + username+"/DarkMatter/topcandidate_file/"+dat_name+"_Skim.root\"\n")
+    # f.write('requirements            = (TARGET.OpSysAndVer =?= "CentOS7")\n')
     f.write("+JobFlavour             = \"testmatch\"\n") # options are espresso = 20 minutes, microcentury = 1 hour, longlunch = 2 hours, workday = 8 hours, tomorrow = 1 day, testmatch = 3 days, nextweek     = 1 week
     f.write("executable              = runner_"+macro_to_run+"_F"+fill+"_"+str(part)+".sh\n")
     f.write("arguments               = \n")
@@ -54,7 +78,7 @@ def sub_writer(macro_to_run, fill, part):
 def sh_writer(macro_to_run, fill, txt_list, part, colliding_scheme, outFolder):
     f = open("runner_"+macro_to_run+"_F"+fill+"_"+str(part)+".sh", "w")
     f.write("#!/usr/bin/bash\n")
-    f.write("cd /afs/cern.ch/user/l/lfavilla/CMSSW_14_0_5_patch1/src/DPGAnalysis/RateVsLumi/analyzer\n")
+    f.write(f"cd /afs/cern.ch/user/l/lfavilla/{release}/src/DPGAnalysis/RateVsLumi/analyzer\n")
     f.write("eval 'scramv1 runtime -sh'\n")
     f.write("cmsenv\n")
     f.write("python3 "+macro_to_run+".py "+str(part)+" ["+",".join(txt_list)+"] "+colliding_scheme+" "+ outFolder+"\n")
@@ -75,19 +99,6 @@ if not os.path.exists("/tmp/x509up_u" + str(uid)):
 os.popen("cp /tmp/x509up_u" + str(uid) + " /afs/cern.ch/user/" + inituser + "/" + username + "/private/x509up")
 
 ######## LAUNCH CONDOR ########
-abs_path             = "/afs/cern.ch/user/l/lfavilla/CMSSW_14_0_5_patch1/src/DPGAnalysis/RateVsLumi"
-fill                 = 8754 # 8754
-if fill==8754:
-    RPCNtuples_txt   = f"{abs_path}/RPCNtuples/crab_ZB_RPCNtuplizer_F8754.txt"
-    colliding_scheme = f"{abs_path}/fill_schemes/Fill_8754/colliding_8754.txt"
-    # outFolder        = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_8754"
-    outFolder        = "/eos/user/l/lfavilla/RPC/analyzer_trial"
-elif fill==9573:
-    RPCNtuples_txt   = f"{abs_path}/RPCNtuples/crab_ZB_RPCNtuplizer_F9573.txt"
-    colliding_scheme = f"{abs_path}/fill_schemes/Fill_9573/colliding_9573.txt"
-    outFolder        = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_9573"
-
-
 txt_files = []
 with open(RPCNtuples_txt, "r") as f:
     lines = f.readlines()
