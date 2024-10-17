@@ -24,15 +24,15 @@ parser.add_argument('-d', '--outDir',           dest = 'outDir',        required
 parser.add_argument('-wd', '--outDir_web',      dest = 'outDir_web',    required = False,                                                     type = str,                             help = 'web directory for the plots')
 parser.add_argument('-p', '--print',            dest = 'print',         required = False,   default = False,                                                action = 'store_true',    help = 'save the plots in png/pdf format')
 
-args        = parser.parse_args()
-inFile      = args.inFile
-fill        = args.fill
-chambers    = args.chambers.split(',')
-outDir      = args.outDir
-outDir_web  = args.outDir_web
-printPlots  = args.print
-regions     = ["high", "low", "prebeam", "abort"]
-superimpose_2018 = False
+args                = parser.parse_args()
+inFile              = args.inFile
+fill                = args.fill
+chambers            = args.chambers.split(',')
+outDir              = args.outDir
+outDir_web          = args.outDir_web
+printPlots          = args.print
+regions             = ["high", "low", "prebeam", "abort"]
+superimpose_2018    = False
 
 if fill==8754:
     year                    = 2023

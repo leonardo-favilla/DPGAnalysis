@@ -10,6 +10,7 @@ from math import sqrt
 import array
 import numpy as np
 import json
+from geometry.mean_cluster_size import mean_cluster_size
 ROOT.gStyle.SetOptStat(0)
 ROOT.gROOT.SetBatch(1)
 
@@ -31,59 +32,6 @@ outDir              = args.outDir
 printPlots          = args.print
 regions             = ["high", "low", "prebeam", "abort"]
 
-mean_cluster_size          = {} # taken from: https://cds.cern.ch/record/2908774?ln=it
-if fill==8754:
-    mean_cluster_size["REp42"] = 1.5
-    mean_cluster_size["REp43"] = 1.5
-    mean_cluster_size["REm42"] = 1.5
-    mean_cluster_size["REm43"] = 1.5
-    mean_cluster_size["REp32"] = 1.8
-    mean_cluster_size["REp33"] = 1.8
-    mean_cluster_size["REm32"] = 1.6
-    mean_cluster_size["REm33"] = 1.6
-    mean_cluster_size["REp22"] = 1.6
-    mean_cluster_size["REp23"] = 1.6
-    mean_cluster_size["REm22"] = 1.9
-    mean_cluster_size["REm23"] = 1.9
-    mean_cluster_size["REp12"] = 1.8
-    mean_cluster_size["REp13"] = 1.8
-    mean_cluster_size["REm12"] = 1.8
-    mean_cluster_size["REm13"] = 1.8
-elif fill==9573:
-    mean_cluster_size["REp42"] = 1.6
-    mean_cluster_size["REp43"] = 1.6
-    mean_cluster_size["REm42"] = 1.6
-    mean_cluster_size["REm43"] = 1.6
-    mean_cluster_size["REp32"] = 1.8
-    mean_cluster_size["REp33"] = 1.8
-    mean_cluster_size["REm32"] = 1.6
-    mean_cluster_size["REm33"] = 1.6
-    mean_cluster_size["REp22"] = 1.7
-    mean_cluster_size["REp23"] = 1.7
-    mean_cluster_size["REm22"] = 2.0
-    mean_cluster_size["REm23"] = 2.0
-    mean_cluster_size["REp12"] = 1.8
-    mean_cluster_size["REp13"] = 1.8
-    mean_cluster_size["REm12"] = 1.8
-    mean_cluster_size["REm13"] = 1.8
-elif fill==10084:
-    mean_cluster_size["REp42"] = 1.6
-    mean_cluster_size["REp43"] = 1.6
-    mean_cluster_size["REm42"] = 1.6
-    mean_cluster_size["REm43"] = 1.6
-    mean_cluster_size["REp32"] = 1.8
-    mean_cluster_size["REp33"] = 1.8
-    mean_cluster_size["REm32"] = 1.6
-    mean_cluster_size["REm33"] = 1.6
-    mean_cluster_size["REp22"] = 1.7
-    mean_cluster_size["REp23"] = 1.7
-    mean_cluster_size["REm22"] = 1.9
-    mean_cluster_size["REm23"] = 1.9
-    mean_cluster_size["REp12"] = 1.8
-    mean_cluster_size["REp13"] = 1.8
-    mean_cluster_size["REm12"] = 1.8
-    mean_cluster_size["REm13"] = 1.8
-
 
 if fill==8754:
     year                    = 2023
@@ -95,6 +43,14 @@ elif fill==9573:
     lumi                    = 635.347                                           # pb-1, Runs: 380115
     colliding_scheme_txt    = "../fill_schemes/Fill_9573/colliding_9573.txt"    # Fill=9573
     fitResults_file         = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_9573_dead_and_noisy_noSectorRollSubdvision/RPC_fit_F9573_fitResults.json"
+elif fill==10084:
+    year                    = 2024
+    lumi                    = 605.541 + 339.651 + 96.919 + 50.607               # pb-1, Runs: 385281 + 385286 + 385285 + 385284
+    colliding_scheme_txt    = "../fill_schemes/Fill_10084/colliding_10084.txt"  # Fill=10084
+    if "Static" in inFile:
+        fitResults_file     = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_10084_Dead_and_StaticNoisy/RPC_fit_F10084_fitResults.json"
+    else:
+        fitResults_file     = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_10084_Dead_and_Noisy/RPC_fit_F10084_fitResults.json"
 
 # fit results #
 fitResults                  = {}
@@ -775,7 +731,7 @@ def HitRateVsLumi_FourChamber_single_region(inFile, chambers, reg, outDir, fit=F
         # hist = copy.deepcopy(histos[ch])
         hist        = histos[ch+"_"+reg]
         hist_error  = histos[ch+"_"+reg+"_error"]
-        hist.Scale(mean_cluster_size[ch.split("_")[0]]) # scale the offline-HitRate by a factor mean_cluster_size when comparing to online-HitRate
+        hist.Scale(mean_cluster_size[fill][ch.split("_")[0]]) # scale the offline-HitRate by a factor mean_cluster_size when comparing to online-HitRate
         for k in range(hist.GetNbinsX()):
             # print(f"bin {k+1} ---> {hist.GetBinCenter(k+1)} ---> {hist.GetBinContent(k+1)}")
             if hist.GetBinCenter(k+1)<9:
@@ -862,7 +818,7 @@ def HitRateVsLumi_FourChamber_single_region(inFile, chambers, reg, outDir, fit=F
             fitFunc     = histos[ch+"_"+reg+"_fit"]
             old_params  = fitFunc.GetParameter(0), fitFunc.GetParameter(1)
             print(f"old params for {ch} in {reg} ---> {old_params}")
-            new_params  = [old_params[0]*mean_cluster_size[ch.split("_")[0]],old_params[1]*mean_cluster_size[ch.split("_")[0]]] # scale the offline-HitRate by a factor mean_cluster_size when comparing to online-HitRate
+            new_params  = [old_params[0]*mean_cluster_size[fill][ch.split("_")[0]],old_params[1]*mean_cluster_size[fill][ch.split("_")[0]]] # scale the offline-HitRate by a factor mean_cluster_size when comparing to online-HitRate
             print(f"new params for {ch} in {reg} ---> {new_params}")
             fitFunc.SetParameter(0, new_params[0])
             fitFunc.SetParameter(1, new_params[1])
@@ -910,7 +866,7 @@ def HitRateVsLumi_FourChamber_single_region(inFile, chambers, reg, outDir, fit=F
             # Draw fit error
             if draw_error:
                 hist_error.GetXaxis().SetRangeUser(0, 80)  
-                hist_error.Scale(mean_cluster_size[ch.split("_")[0]]) # scale the offline-HitRate by a factor mean_cluster_size when comparing to online-HitRate
+                hist_error.Scale(mean_cluster_size[fill][ch.split("_")[0]]) # scale the offline-HitRate by a factor mean_cluster_size when comparing to online-HitRate
                 hist_error.SetMarkerSize(0)
                 hist_error.GetYaxis().SetLabelOffset(999)
                 hist_error.GetXaxis().SetLabelSize(0)
