@@ -17,20 +17,22 @@ ROOT.gROOT.SetBatch(1)
 usage       = 'python3 HitRate_eta.py -i <input root file>'
 example     = 'python3 HitRate_eta.py -i /eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_9573/RPC_fit_F9573.root -c RB1in -d /eos/user/l/lfavilla/RPC/plots/RPC_fit_F9573 -p'
 parser      = argparse.ArgumentParser(usage)
-parser.add_argument('-i', '--inFile',     dest = 'inFile',    required = True,                                type = str,                             help = 'input root file (should be the output of RPCFitter.py)')
-parser.add_argument('-f', '--fill',       dest = 'fill',      required = True,                                type = int,                             help = 'specify the fill number')
-parser.add_argument('-c', '--chambers',   dest = 'chambers',  required = False,   default = 'Wm2_RB1in',      type = str,                             help = 'specify the chambers to be plotted - default Wm2_RB1in')
-parser.add_argument('-d', '--outDir',     dest = 'outDir',    required = False,   default = './',             type = str,                             help = 'output directory for the plots - default is the current directory')
-parser.add_argument('-p', '--print',      dest = 'print',     required = False,   default = False,                            action = 'store_true',  help = 'save the plots in png/pdf format')
+parser.add_argument('-i', '--inFile',           dest = 'inFile',        required = True,                                                      type = str,                             help = 'input root file (should be the output of RPCFitter.py)')
+parser.add_argument('-f', '--fill',             dest = 'fill',          required = True,                                                      type = int,                             help = 'specify the fill number')
+parser.add_argument('-c', '--chambers',         dest = 'chambers',      required = False,   default = 'Wm2_RB1in',                            type = str,                             help = 'specify the chambers to be plotted - default Wm2_RB1in')
+parser.add_argument('-d', '--outDir',           dest = 'outDir',        required = False,   default = './',                                   type = str,                             help = 'output directory for the plots - default is the current directory')
+parser.add_argument('-wd', '--outDir_web',      dest = 'outDir_web',    required = False,                                                     type = str,                             help = 'web directory for the plots')
+parser.add_argument('-p', '--print',            dest = 'print',         required = False,   default = False,                                                action = 'store_true',    help = 'save the plots in png/pdf format')
 
 args        = parser.parse_args()
 inFile      = args.inFile
 fill        = args.fill
 chambers    = args.chambers.split(',')
 outDir      = args.outDir
+outDir_web  = args.outDir_web
 printPlots  = args.print
 regions     = ["high", "low", "prebeam", "abort"]
-superimpose_2018 = True
+superimpose_2018 = False
 
 if fill==8754:
     year                    = 2023
@@ -40,16 +42,28 @@ elif fill==9573:
     year                    = 2024
     lumi                    = 635.347                                           # pb-1, Runs: 380115
     colliding_scheme_txt    = "../fill_schemes/Fill_9573/colliding_9573.txt"    # Fill=9573
-    
+elif fill==10084:
+    year                    = 2024
+    lumi                    = 605.541 + 339.651 + 96.919 + 50.607               # pb-1, Runs: 385281 + 385286 + 385285 + 385284
+    colliding_scheme_txt    = "../fill_schemes/Fill_10084/colliding_10084.txt"  # Fill=10084
+
+
 # fit results #
-fitResults_file             = {}
-fitResults                  = {}
-fitResults_file["9573"]     = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_9573_dead_and_noisy_noSectorRollSubdvision/RPC_fit_F9573_fitResults.json"
-fitResults_file["8754"]     = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_8754/RPC_fit_F8754_fitResults.json"
+fitResults_file                 = {}
+fitResults                      = {}
+fitResults_file["9573"]         = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_9573_dead_and_noisy_noSectorRollSubdvision/RPC_fit_F9573_fitResults.json"
+fitResults_file["8754"]         = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_8754/RPC_fit_F8754_fitResults.json"
+if "Static" in inFile:
+    fitResults_file["10084"]    = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_10084_Dead_and_StaticNoisy/RPC_fit_F10084_fitResults.json"
+else:
+    fitResults_file["10084"]    = "/eos/user/l/lfavilla/RPC/post_RPC_Analyzer/Fill_10084_Dead_and_Noisy/RPC_fit_F10084_fitResults.json"
+
 with open(fitResults_file["9573"], "r") as f:
     fitResults["9573"]      = json.load(f)
 with open(fitResults_file["8754"], "r") as f:
     fitResults["8754"]      = json.load(f)
+with open(fitResults_file["10084"], "r") as f:
+    fitResults["10084"]     = json.load(f)
 
 HitRate_eta_2018            = {}
 for station in ["RB1in","RB1out","RB2in","RB2out","RB3","RB4"]:
@@ -877,10 +891,11 @@ if not os.path.exists(outDir_pdf):
     os.makedirs(outDir_pdf)
 if not os.path.exists(outDir_C):
     os.makedirs(outDir_C)
-    
 
-
-
+if outDir_web:
+    if not os.path.exists(outDir_web):
+        os.makedirs(outDir_web)
+        os.popen(f"cp /eos/user/l/lfavilla/index.php {outDir_web}")
 
 
 def HitRateVsEta_Barrel_bkgs(inFile, ch, outDir, lumi=1, printPlots=False, legPos="ur"):
@@ -935,7 +950,7 @@ def HitRateVsEta_Barrel_bkgs(inFile, ch, outDir, lumi=1, printPlots=False, legPo
         if superimpose_2018:
             leg = ROOT.TLegend(0.13, 0.03, 0.5, 0.2) # with ratio
     leg.SetTextFont(42)
-    leg.SetTextSize(0.04)
+    leg.SetTextSize(0.03)
     leg.AddEntry("None", ch, "")
     leg.AddEntry("None", "", "")
     leg.AddEntry("None", "", "")
@@ -1329,6 +1344,7 @@ def HitRateVsEta_Endcap_bkgs(inFile, disk, outDir, lumi=1, printPlots=False, leg
     c.cd()
 
     if superimpose_2018:
+        npads = 2
         pad1 = ROOT.TPad("pad1", "pad1", 0, 0.31, 1, 1)
         pad1.SetTopMargin(0.1)
         pad1.SetBottomMargin(0.017) # 0.015
@@ -1337,18 +1353,23 @@ def HitRateVsEta_Endcap_bkgs(inFile, disk, outDir, lumi=1, printPlots=False, leg
         pad1.SetBorderMode(0)
         pad1.SetTickx(1)
         pad1.SetTicky(1)
+        pad1.Draw()
+        pad1.SetLogy()
+        pad1.SetGrid()
+        pad1.cd()
     else:
+        npads = 1
         pad1 = ROOT.TPad("pad1", "pad1", 0.01, 0.01, 0.99, 0.99)
-    pad1.Draw()
-    pad1.SetLogy()
-    pad1.SetGrid()
+        pad1.Draw()
+        pad1.SetLogy()
+        pad1.SetGrid()
+        pad1.cd()
 
-    pad1.cd()
     # Create the legend
     if legPos=="ur":
-        leg = ROOT.TLegend(0.7, 0.7, 0.89, 0.89) # up-right corner
+        leg = ROOT.TLegend(0.7, 0.75, 0.89, 0.89) # up-right corner
     elif legPos=="ul":
-        leg = ROOT.TLegend(0.11, 0.7, 0.30, 0.89) # up-left corner
+        leg = ROOT.TLegend(0.11, 0.75, 0.30, 0.89) # up-left corner
         if superimpose_2018:
             leg = ROOT.TLegend(0.13, 0.7, 0.5, 0.89) # whithout ratio
             # leg = ROOT.TLegend(0.11, 0.8, 0.6, 0.95) # with ratio
@@ -1360,10 +1381,11 @@ def HitRateVsEta_Endcap_bkgs(inFile, disk, outDir, lumi=1, printPlots=False, leg
             # leg = ROOT.TLegend(0.11, 0.11, 0.6, 0.25) # whithout ratio
             leg = ROOT.TLegend(0.13, 0.01, 0.55, 0.2) # with ratio
     leg.SetTextFont(42)
-    leg.SetTextSize(0.04)
+    leg.SetTextSize(0.03)
     leg.AddEntry("None", disk, "")
-    leg.AddEntry("None", "", "")
-    leg.AddEntry("None", "", "")
+    if superimpose_2018:
+        leg.AddEntry("None", "", "")
+        leg.AddEntry("None", "", "")
 
     # definition of the types of background
     bkgs        = ["inclusive", "delayed", "prompt"]
@@ -1487,7 +1509,7 @@ def HitRateVsEta_Endcap_bkgs(inFile, disk, outDir, lumi=1, printPlots=False, leg
             ch,part = chamber.split("_")
             print(f"Processing ---> {disk} {chamber} for {bkg} background")
             func        = funcs[chamber+"_"+bkg+"_fit"]
-            x           = 10
+            x           = 10 # here you can fix the Inst.Lumi to 10-->1e34cm^-2s^-1, 20-->2e34cm^-2s^-1, 50-->5e34cm^-2s^-1 etc...
             if draw_error:
                 data[bkg]["X"].append(geometry_dict[ch][part]["eta"]) 
                 data[bkg]["Y"].append(func.Eval(x)) # func.Eval(10) means we are going to fix the Inst.Lumi to 1e34cm^-2s^-1
@@ -1504,10 +1526,27 @@ def HitRateVsEta_Endcap_bkgs(inFile, disk, outDir, lumi=1, printPlots=False, leg
                 print("y_err:               ", y_err)
                 print("y value:             ", func.Eval(x))
             else:
-                data[bkg]["X"].append(geometry_dict[ch][part]["eta"]) 
+                data[bkg]["X"].append(geometry_dict[ch][part]["eta"])
                 data[bkg]["Y"].append(func.Eval(x)) # func.Eval(10) means we are going to fix the Inst.Lumi to 1e34cm^-2s^-1
                 data[bkg]["EX"].append(0.0)
                 data[bkg]["EY"].append(0.0)
+
+    ###### Printing Data ######
+    for bkg in bkgs:
+        print(f"{bkg} data")
+        print(f"X:      {data[bkg]['X']}")
+        print(f"Y:      {data[bkg]['Y']}")
+        print(f"EX:     {data[bkg]['EX']}")
+        print(f"EY:     {data[bkg]['EY']}")
+        print("\n")
+
+    ####################################################
+    ###### Saving some useful data into .txt file ######
+    ####################################################
+    with open(outDir+"/HitRateVsEta_"+disk+".txt", "w") as f:
+        f.write("eta inclusive(Hz/cm2) inclusive_error(Hz/cm2) delayed(Hz/cm2) delayed_error(Hz/cm2) prompt(Hz/cm2) prompt_error(Hz/cm2)\n")
+        for x,y_incl,ey_incl,y_del,ey_del,y_pro,ey_pro in zip(data["inclusive"]["X"], data["inclusive"]["Y"], data["inclusive"]["EY"], data["delayed"]["Y"], data["delayed"]["EY"], data["prompt"]["Y"], data["prompt"]["EY"]):
+            f.write(f"{x} {y_incl} {ey_incl} {y_del} {ey_del} {y_pro} {ey_pro}\n")
 
     if draw_error:
         graphs  = {bkg: ROOT.TGraphErrors(len(data[bkg]["X"]), array.array("d", data[bkg]["X"]), array.array("d", data[bkg]["Y"]), array.array("d", data[bkg]["EX"]), array.array("d", data[bkg]["EY"])) for bkg in bkgs}
@@ -1521,7 +1560,10 @@ def HitRateVsEta_Endcap_bkgs(inFile, disk, outDir, lumi=1, printPlots=False, leg
         # graphs[bkg].SetTitle(disk)
         graphs[bkg].SetTitle("")
         graphs[bkg].GetXaxis().SetTitle("#eta")
-        graphs[bkg].GetXaxis().SetLabelSize(0) # 0.04
+        if superimpose_2018:
+            graphs[bkg].GetXaxis().SetLabelSize(0) # 0.0, 0.04
+        else:
+            graphs[bkg].GetXaxis().SetLabelSize(0.04)
         graphs[bkg].GetXaxis().SetTitleSize(0.045)
         graphs[bkg].GetYaxis().SetTitle("Hit Rate (Hz/cm^{2})")
         graphs[bkg].GetYaxis().SetLabelSize(0.04)
@@ -1622,23 +1664,28 @@ def HitRateVsEta_Endcap_bkgs(inFile, disk, outDir, lumi=1, printPlots=False, leg
 
     # pad1.cd()
     writeExtraText          = 1
-    # extraText               = "Work in progress"
-    extraText               = "Preliminary"
-    lepText                 = ""
+    extraText               = "Work in progress"
+    # extraText               = "Preliminary"
+    lepText                 = "Dead and Noisy strips masked"
+    if "Static" in inFile:
+        lepText             = "Dead and StaticNoisy strips masked"
+
     # lumi_sqrtS              = disk + ", " + "%s fb^{-1}  (13.6 TeV)"%(round(lumi,3))
     # lumi_sqrtS              = disk + ", " + "(13.6 TeV)"
     if not superimpose_2018:
-        lumi_sqrtS          = "Run 3 (13.6 TeV)"
+        # lumi_sqrtS          = "Run 3 (13.6 TeV)"
+        lumi_sqrtS          = f"Fill {fill}, Run 3 - {year} (13.6 TeV)"
     else:
         lumi_sqrtS          = "Run 2 (13 TeV), Run 3 (13.6 TeV)"
     iPeriod                 = 0
     iPos                    = 0
-    CMS_lumi(pad1, lumi_sqrtS, iPos, writeExtraText, extraText, lepText) # CMS_lumi(pad, lumi_sqrtS, iPosX, writeExtraText, extraText, lepText), lepText is usually a region
+    CMS_lumi(pad1, lumi_sqrtS, iPos, writeExtraText, extraText, lepText, npads) # CMS_lumi(pad, lumi_sqrtS, iPosX, writeExtraText, extraText, lepText, npads), lepText is usually a region, npads is the number of pads contained in the canvas and is used to adjust the CMS/extraText distance
     # pad1.Draw()
     pad1.Update()
 
     c.cd()
-
+    c.RedrawAxis()
+    pad1.RedrawAxis()
     if superimpose_2018:
         pad2 = ROOT.TPad("pad2", "pad2", 0, 0, 1, 0.30)
         pad2.SetTopMargin(0.05)
@@ -1725,13 +1772,27 @@ def HitRateVsEta_Endcap_bkgs(inFile, disk, outDir, lumi=1, printPlots=False, leg
     # Save the plot
     if printPlots:
         if superimpose_2018:
-            c.SaveAs(outDir_png+"/HitRateVsEta_"+disk+"_bkgs_w2018_Ratio_syst_"+str(year)+"_APPROVED.png")
-            c.SaveAs(outDir_pdf+"/HitRateVsEta_"+disk+"_bkgs_w2018_Ratio_syst_"+str(year)+"_APPROVED.pdf")
-            c.SaveAs(outDir_C+"/HitRateVsEta_"+disk+"_bkgs_w2018_Ratio_syst_"+str(year)+"_APPROVED.C")
+            # c.SaveAs(outDir_png+"/HitRateVsEta_"+disk+"_bkgs_w2018_Ratio_syst_"+str(year)+"_APPROVED.png")
+            # c.SaveAs(outDir_pdf+"/HitRateVsEta_"+disk+"_bkgs_w2018_Ratio_syst_"+str(year)+"_APPROVED.pdf")
+            # c.SaveAs(outDir_C+"/HitRateVsEta_"+disk+"_bkgs_w2018_Ratio_syst_"+str(year)+"_APPROVED.C")
+            c.SaveAs(outDir_png+"/HitRateVsEta_"+disk+"_bkgs_w2018_Ratio"+str(year)+".png")
+            c.SaveAs(outDir_pdf+"/HitRateVsEta_"+disk+"_bkgs_w2018_Ratio"+str(year)+".pdf")
+            c.SaveAs(outDir_C+"/HitRateVsEta_"+disk+"_bkgs_w2018_Ratio"+str(year)+".C")
+            # save to CERN Website
+            if outDir_web:
+                c.SaveAs(outDir_web+"/HitRateVsEta_"+disk+"_bkgs_w2018_Ratio"+str(year)+".png")
+                c.SaveAs(outDir_web+"/HitRateVsEta_"+disk+"_bkgs_w2018_Ratio"+str(year)+".pdf")
         else:
-            c.SaveAs(outDir_png+"/HitRateVsEta_"+disk+"_bkgs_"+str(year)+"_APPROVED.png")
-            c.SaveAs(outDir_pdf+"/HitRateVsEta_"+disk+"_bkgs_"+str(year)+"_APPROVED.pdf")
-            c.SaveAs(outDir_C+"/HitRateVsEta_"+disk+"_bkgs_"+str(year)+"_APPROVED.C")
+            # c.SaveAs(outDir_png+"/HitRateVsEta_"+disk+"_bkgs_"+str(year)+"_APPROVED.png")
+            # c.SaveAs(outDir_pdf+"/HitRateVsEta_"+disk+"_bkgs_"+str(year)+"_APPROVED.pdf")
+            # c.SaveAs(outDir_C+"/HitRateVsEta_"+disk+"_bkgs_"+str(year)+"_APPROVED.C")
+            c.SaveAs(outDir_png+"/HitRateVsEta_"+disk+"_bkgs_"+str(year)+".png")
+            c.SaveAs(outDir_pdf+"/HitRateVsEta_"+disk+"_bkgs_"+str(year)+".pdf")
+            c.SaveAs(outDir_C+"/HitRateVsEta_"+disk+"_bkgs_"+str(year)+".C")
+            # save to CERN Website
+            if outDir_web:
+                c.SaveAs(outDir_web+"/HitRateVsEta_"+disk+"_bkgs_"+str(year)+".png")
+                c.SaveAs(outDir_web+"/HitRateVsEta_"+disk+"_bkgs_"+str(year)+".pdf")
 
 
 if chambers[0].startswith("RB"):
@@ -1741,4 +1802,4 @@ if chambers[0].startswith("RB"):
         HitRateVsEta_Barrel_bkgs(inFile, chambers[0], outDir, lumi*1e-3, printPlots, legPos="ul")
 
 elif chambers[0].startswith("RE"):
-    HitRateVsEta_Endcap_bkgs(inFile, chambers[0], outDir, lumi*1e-3, printPlots, legPos="ul")
+    HitRateVsEta_Endcap_bkgs(inFile, chambers[0], outDir, lumi*1e-3, printPlots, legPos="ur")
