@@ -31,16 +31,24 @@ outDir              = args.outDir
 printPlots          = args.print
 regions             = ["high", "low", "prebeam", "abort"]
 
-mean_cluster_size          = {}
+mean_cluster_size          = {} # taken from: https://cds.cern.ch/record/2908774?ln=it
 if fill==8754:
-    mean_cluster_size["REp42"] = 1.5 # 1.6 for Fill 9573, 1.5 for Fill 8754
-    mean_cluster_size["REp43"] = 1.5 # 1.6 for Fill 9573, 1.5 for Fill 8754
-    mean_cluster_size["REm42"] = 1.5 # 1.6 for Fill 9573, 1.5 for Fill 8754
-    mean_cluster_size["REm43"] = 1.5 # 1.6 for Fill 9573, 1.5 for Fill 8754
-    mean_cluster_size["REp32"] = 1.8 # 1.8 for Fill 9573, 1.8 for Fill 8754
-    mean_cluster_size["REp33"] = 1.8 # 1.8 for Fill 9573, 1.8 for Fill 8754
-    mean_cluster_size["REm32"] = 1.6 # 1.6 for Fill 9573, 1.6 for Fill 8754
-    mean_cluster_size["REm33"] = 1.6 # 1.6 for Fill 9573, 1.6 for Fill 8754
+    mean_cluster_size["REp42"] = 1.5
+    mean_cluster_size["REp43"] = 1.5
+    mean_cluster_size["REm42"] = 1.5
+    mean_cluster_size["REm43"] = 1.5
+    mean_cluster_size["REp32"] = 1.8
+    mean_cluster_size["REp33"] = 1.8
+    mean_cluster_size["REm32"] = 1.6
+    mean_cluster_size["REm33"] = 1.6
+    mean_cluster_size["REp22"] = 1.6
+    mean_cluster_size["REp23"] = 1.6
+    mean_cluster_size["REm22"] = 1.9
+    mean_cluster_size["REm23"] = 1.9
+    mean_cluster_size["REp12"] = 1.8
+    mean_cluster_size["REp13"] = 1.8
+    mean_cluster_size["REm12"] = 1.8
+    mean_cluster_size["REm13"] = 1.8
 elif fill==9573:
     mean_cluster_size["REp42"] = 1.6
     mean_cluster_size["REp43"] = 1.6
@@ -50,7 +58,31 @@ elif fill==9573:
     mean_cluster_size["REp33"] = 1.8
     mean_cluster_size["REm32"] = 1.6
     mean_cluster_size["REm33"] = 1.6
-
+    mean_cluster_size["REp22"] = 1.7
+    mean_cluster_size["REp23"] = 1.7
+    mean_cluster_size["REm22"] = 2.0
+    mean_cluster_size["REm23"] = 2.0
+    mean_cluster_size["REp12"] = 1.8
+    mean_cluster_size["REp13"] = 1.8
+    mean_cluster_size["REm12"] = 1.8
+    mean_cluster_size["REm13"] = 1.8
+elif fill==10084:
+    mean_cluster_size["REp42"] = 1.6
+    mean_cluster_size["REp43"] = 1.6
+    mean_cluster_size["REm42"] = 1.6
+    mean_cluster_size["REm43"] = 1.6
+    mean_cluster_size["REp32"] = 1.8
+    mean_cluster_size["REp33"] = 1.8
+    mean_cluster_size["REm32"] = 1.6
+    mean_cluster_size["REm33"] = 1.6
+    mean_cluster_size["REp22"] = 1.7
+    mean_cluster_size["REp23"] = 1.7
+    mean_cluster_size["REm22"] = 1.9
+    mean_cluster_size["REm23"] = 1.9
+    mean_cluster_size["REp12"] = 1.8
+    mean_cluster_size["REp13"] = 1.8
+    mean_cluster_size["REm12"] = 1.8
+    mean_cluster_size["REm13"] = 1.8
 
 
 if fill==8754:
